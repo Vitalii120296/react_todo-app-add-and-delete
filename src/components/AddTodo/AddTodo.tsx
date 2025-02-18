@@ -1,10 +1,20 @@
-import React, { useRef } from 'react';
+import React from 'react';
 
-type Props = {};
+type Props = {
+  inputRef: React.RefObject<HTMLInputElement>;
+  newTodo: string;
+  setNewTodo: (value: string) => void;
+  handleSubmit: (event: React.FormEvent) => void;
+  isSubmiting: boolean;
+};
 
-export const AddTodo: React.FC<Props> = ({}) => {
-  const inputRef = useRef<HTMLInputElement>(null); //focus on input element
-
+export const AddTodo: React.FC<Props> = ({
+  inputRef,
+  newTodo,
+  setNewTodo,
+  handleSubmit,
+  isSubmiting,
+}) => {
   return (
     <form onSubmit={handleSubmit}>
       <input
