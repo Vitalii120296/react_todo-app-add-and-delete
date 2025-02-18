@@ -126,14 +126,19 @@ export const App: React.FC = () => {
       completedTodos.map(todo =>
         deleteTodo(todo.id).catch(() => {
           handleErrorMessage('Unable to delete a todo');
+
+          return Promise.reject({ id: todo.id }); // Передаємо id в reason
         }),
       ),
     )
-      .then(results => {
+      .then(response => {
+        const failedIds = response
+          .filter(r => r.status === 'rejected') // Фільтруємо тільки відхилені проміси
+          .map(r => (r.reason as { id: number }).id); // Дістаємо id з reason
+
         setTodos(currentTodos =>
           currentTodos.filter(
-            (todo, index) =>
-              !todo.completed || results[index].status === 'rejected',
+            todo => !todo.completed || failedIds.includes(todo.id),
           ),
         );
       })
