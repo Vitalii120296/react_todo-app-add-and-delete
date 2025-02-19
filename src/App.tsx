@@ -19,12 +19,12 @@ import { Filter } from './types/Filter';
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<Filter>(Filter.all);
-  const [newTodo, setNewTodo] = useState(''); //input element
+  const [newTodo, setNewTodo] = useState('');
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [loader, setLoader] = useState<number>(0);
   const [isSubmiting, setIsSubmiting] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null); //focus on input element
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleErrorMessage = (message: string) => {
     setErrorMessage(message);
@@ -46,19 +46,17 @@ export const App: React.FC = () => {
       });
   }, []);
 
-  function getFilterTodos(todoForFilter: Todo[], enumFilter: number): Todo[] {
-    if (enumFilter === Filter.active) {
-      return todoForFilter.filter(todo => !todo.completed);
+  const filteredTodos = todos.filter(todo => {
+    if (filter === Filter.active) {
+      return !todo.completed;
     }
 
-    if (enumFilter === Filter.completed) {
-      return todoForFilter.filter(todo => todo.completed);
+    if (filter === Filter.completed) {
+      return todo.completed;
     }
 
-    return todoForFilter;
-  }
-
-  const filteredTodos = getFilterTodos(todos, filter);
+    return true;
+  });
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -127,14 +125,14 @@ export const App: React.FC = () => {
         deleteTodo(todo.id).catch(() => {
           handleErrorMessage('Unable to delete a todo');
 
-          return Promise.reject({ id: todo.id }); // Передаємо id в reason
+          return Promise.reject({ id: todo.id });
         }),
       ),
     )
       .then(response => {
         const failedIds = response
-          .filter(r => r.status === 'rejected') // Фільтруємо тільки відхилені проміси
-          .map(r => (r.reason as { id: number }).id); // Дістаємо id з reason
+          .filter(r => r.status === 'rejected')
+          .map(r => (r.reason as { id: number }).id);
 
         setTodos(currentTodos =>
           currentTodos.filter(
@@ -167,7 +165,7 @@ export const App: React.FC = () => {
         handleErrorMessage('Unable to update a todo');
       })
       .finally(() => {
-        setLoader(null);
+        setLoader(0);
       });
   };
 
